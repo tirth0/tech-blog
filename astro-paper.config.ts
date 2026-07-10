@@ -2,9 +2,9 @@ import { defineAstroPaperConfig } from "./src/types/config";
 
 export default defineAstroPaperConfig({
   site: {
-    url: "https://astro-paper.pages.dev/",
-    title: "Tech by Tirtho",
-    description: "A minimal, responsive and SEO-friendly Astro blog theme.",
+    url: "https://tirth0.blog",
+    title: "Dev Ideas",
+    description: "Dev Ideas, case studies and my exploration in the world of tech",
     author: "Tirtho",
     profile: "https://www.linkedin.com/in/tirtharaj-sengupta-5953621a1/",
     ogImage: "default-og.jpg",
@@ -24,7 +24,7 @@ export default defineAstroPaperConfig({
     showBackButton: true,
     editPost: {
       enabled: true,
-      url: "https://github.com/satnaing/astro-paper/edit/main/",
+      url: "https://github.com/tirth0/tech-blog/edit/main/",
     },
     search: "pagefind",
   },
