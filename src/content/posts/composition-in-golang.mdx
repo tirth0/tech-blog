@@ -1,0 +1,216 @@
+---
+author: Tirtharaj Sengupta
+pubDatetime: 2022-09-23T15:22:00Z
+modDatetime: 2022-06-23T00:00:00.000Z
+title: Composition in Golang
+slug: composition-in-golang
+featured: false
+draft: false
+tags:
+  - golang
+  - programming
+  - composition
+description: "Learn how composition works in Go using struct embedding and interface embedding, and why it is Go's preferred mechanism for code reuse."
+canonicalURL: https://www.geeksforgeeks.org/go-language/composition-in-golang/
+---
+
+# Composition in Go
+
+Composition is a method employed to write reusable segments of code. It is achieved when objects are made up of other smaller objects with particular behaviors. In other words, larger objects with wider functionality are composed of smaller objects with specific behaviors.
+
+The end goal of composition is similar to inheritance. However, instead of inheriting features from a parent class or object, larger objects are composed of other objects and can thereby use their functionality.
+
+Since writing effective Go code revolves primarily around using structs and interfaces, composition is a fundamental concept in the language. In this article, we'll discuss composition through type embedding in both structs and interfaces.
+
+![Composition in GoLang](/posts/composition-in-golang/index.png)
+
+## Composition of Structs
+
+```go
+package main
+
+import "fmt"
+
+// Generic information about games
+type details struct {
+	genre       string
+	genreRating string
+	reviews     string
+}
+
+// Specific information about a game
+type game struct {
+	name  string
+	price string
+
+	// Embed details
+	details
+}
+
+// Method on details
+func (d details) showDetails() {
+	fmt.Println("Genre:", d.genre)
+	fmt.Println("Genre Rating:", d.genreRating)
+	fmt.Println("Reviews:", d.reviews)
+}
+
+// Method on game
+func (g game) show() {
+	fmt.Println("Name:", g.name)
+	fmt.Println("Price:", g.price)
+	g.showDetails()
+}
+
+func main() {
+	action := details{
+		genre:       "Action",
+		genreRating: "18+",
+		reviews:     "Mostly Positive",
+	}
+
+	newGame := game{
+		name:    "XYZ",
+		price:   "$125",
+		details: action,
+	}
+
+	newGame.show()
+}
+```
+
+### Output
+
+```text
+Name: XYZ
+Price: $125
+Genre: Action
+Genre Rating: 18+
+Reviews: Mostly Positive
+```
+
+### Explanation
+
+In this example, we created two structs:
+
+- `details`, which stores generic information about games.
+- `game`, which stores information about a specific game.
+
+The `game` struct embeds the `details` struct. This allows `game` to access all the fields and methods defined on `details` without explicitly forwarding them.
+
+As a result:
+
+- `details` becomes a reusable building block.
+- `game` gains access to the `showDetails()` method through embedding.
+
+## Composition Through Embedded Interfaces
+
+In Go, interfaces are implemented implicitly. If a type provides all the methods required by an interface, it automatically implements that interface.
+
+Interfaces themselves can also embed other interfaces to form larger, composite interfaces.
+
+If a type implements all the methods of the embedded interfaces, it also satisfies the composite interface.
+
+```go
+package main
+
+import "fmt"
+
+type purchase interface {
+	sell()
+}
+
+type display interface {
+	show()
+}
+
+// Composite interface
+type salesman interface {
+	purchase
+	display
+}
+
+type game struct {
+	name           string
+	price          string
+	gameCollection []string
+}
+
+func (g game) sell() {
+	fmt.Println("--------------------------------------")
+	fmt.Println("Name:", g.name)
+	fmt.Println("Price:", g.price)
+	fmt.Println("--------------------------------------")
+}
+
+func (g game) show() {
+	fmt.Println("The games available are:")
+
+	for _, name := range g.gameCollection {
+		fmt.Println(name)
+	}
+
+	fmt.Println("--------------------------------------")
+}
+
+func shop(s salesman) {
+	fmt.Println(s)
+	s.sell()
+	s.show()
+}
+
+func main() {
+	collection := []string{
+		"XYZ",
+		"Trial by Code",
+		"Sea of Rubies",
+	}
+
+	game1 := game{
+		name:           "ABC",
+		price:          "$125",
+		gameCollection: collection,
+	}
+
+	shop(game1)
+}
+```
+
+### Output
+
+```text
+{ABC $125 [XYZ Trial by Code Sea of Rubies]}
+--------------------------------------
+Name: ABC
+Price: $125
+--------------------------------------
+The games available are:
+XYZ
+Trial by Code
+Sea of Rubies
+--------------------------------------
+```
+
+### Explanation
+
+In this example:
+
+- `purchase` defines a `sell()` method.
+- `display` defines a `show()` method.
+- `salesman` embeds both interfaces, creating a composite interface.
+
+The `game` type implements both `sell()` and `show()`, meaning it automatically satisfies the `salesman` interface.
+
+The `shop()` function accepts a `salesman`, allowing it to call methods from both embedded interfaces.
+
+This demonstrates how interface composition enables reusable abstractions without requiring inheritance.
+
+## Summary
+
+Composition is Go's preferred mechanism for code reuse. Instead of relying on inheritance, Go encourages building larger types from smaller, focused components through embedding.
+
+Composition can be applied to:
+
+- **Structs**, by embedding one struct inside another.
+- **Interfaces**, by combining multiple interfaces into a larger one.
+
+This approach results in code that is modular, reusable, and idiomatic to Go.

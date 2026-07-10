@@ -3,35 +3,42 @@ title: "About"
 description: "A bit about me and this blog."
 ---
 
-AstroPaper is a minimal, accessible and SEO-friendly blog theme built with [Astro](https://astro.build/) and [Tailwind CSS](https://tailwindcss.com/).
+Hi 👋, I'm Tirtho.  
+I'm a Fullstack Software Engineer at Ringover.  
+I work remotely from Kolkata, West Bengal.
 
-![Astro Paper](@/assets/images/astropaper-og.jpg)
+## What I do
 
-AstroPaper provides a solid foundation for blogs, or even portfolios\_ with full markdown support, built-in dark mode, and a clean layout that works out-of-the-box.
+### Fullstack Software Engineer - Ringover [2023-Present]
 
-The blog posts in this theme also serve as guides, docs or example articles\_ making AstroPaper a flexible starting point for your next content-driven site.
+- Architected and delivered ”a talk to your knowledge base” chatbot using RAG,
+  enhanced context and relationship preservation using graphRAG.
+- Managed the responsibilities of a technical lead for a Data Visualization platform,
+  including custom drag-and-drop implementation, custom DSL and parser genera-
+  tion, multi-tenancy with Clickhouse, and developing on-the-fly ETL pipelines in a
+  distributed backend and analytics for clients.
+- Introduced low-level design principles (strategy, visitor, adapter patterns) to en-
+  hance codebase usability and maintainability
 
-## Features
+### Fullstack Software Engineer Intern - Ringover [2022-2023]
 
-AstroPaper comes with a set of useful features that make content publishing easy and effective:
+- Created a CI/CD workflow as a team lead, enhancing team efficiency. Deployed
+  distributed systems using Docker and Docker Swarm.
+- Worked with WebRTC SFU architecture to provide high-definition video calling
+  interfaces
 
-- SEO-friendly
-- Fast performance
-- Light & dark mode
-- Highly customizable
-- Organizable blog posts
-- Responsive & accessible
-- Static search with [PageFind](https://pagefind.app/)
-- Automatic social image generation
+## What I Like
 
-and so much more.
+Hackathons! haven't had the chance to participate in one in a while, but I absolutely love them.
 
-## Show your support
+### Rakathon 2022 - Second Runner Up
 
-If you like [AstroPaper](https://github.com/satnaing/astro-paper), consider giving it a star ⭐️.
+National 3rd Place in Rakathon 2022, organized by Rakuten India. Our team presented the idea and a short prototype for a data broking system providing hyperlocal attraction/brand data and providing location based intelligence such as area wise footfall, purchasing intent of a crowd etc.
 
-Found a bug 🐛 or have an improvement ✨ in mind? Feel free to open an [issue](https://github.com/satnaing/astro-paper/issues), submit a [pull request](https://github.com/satnaing/astro-paper/pulls) or start a [discussion](https://github.com/satnaing/astro-paper/discussions).
+### Smart India Hackathon - First Place
 
-If you find this theme helpful, you can also [sponsor me on GitHub](https://github.com/sponsors/satnaing) or [buy me a coffee](https://buymeacoffee.com/satnaing) to show your support — every penny counts.
+First Place in SIH 2022 for the problem statement by the Ministry of Water Resources. We presented a prototype for Satellite imagery based precision farming, to preserve water and optimise crop irrigation.
 
-Kyay zuu! 🙏🏼
+---
+
+This blog was made with [AstroPaper](https://astro-paper.pages.dev/) — special shoutout to [Sat Naing](https://satna.ing/) for developing this awesome utility for Astro!

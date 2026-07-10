@@ -1,0 +1,68 @@
+---
+import {
+  experimental_getFontFileURL,
+  fontData,
+} from "astro:assets";
+
+import { getFontPathByWeight } from "@/utils/getFontPathByWeight";
+
+import { renderERDiagram } from "./renderer";
+import type { ERDiagramProps } from "./types";
+
+const props = Astro.props as ERDiagramProps;
+
+const fonts = fontData["--font-google-sans-code"];
+
+const regularFontPath = getFontPathByWeight(fonts, 400);
+const boldFontPath = getFontPathByWeight(fonts, 700);
+
+if (!regularFontPath || !boldFontPath) {
+  throw new Error("Unable to locate Google Sans Code fonts.");
+}
+
+const [regularData, boldData] = await Promise.all([
+  fetch(
+    experimental_getFontFileURL(
+      regularFontPath,
+      Astro.url
+    )
+  ).then(res => res.arrayBuffer()),
+
+  fetch(
+    experimental_getFontFileURL(
+      boldFontPath,
+      Astro.url
+    )
+  ).then(res => res.arrayBuffer()),
+]);
+
+const svg = await renderERDiagram(props, [
+  {
+    name: "Google Sans Code",
+    data: regularData,
+    weight: 400,
+    style: "normal",
+  },
+  {
+    name: "Google Sans Code",
+    data: boldData,
+    weight: 700,
+    style: "normal",
+  },
+]);
+---
+
+<div class="erd-diagram" set:html={svg} />
+
+<style>
+  .erd-diagram {
+    width: 100%;
+    overflow-x: auto;
+  }
+
+  .erd-diagram :global(svg) {
+    width: 100%;
+    height: auto;
+    max-width: 100%;
+  }
+</style>

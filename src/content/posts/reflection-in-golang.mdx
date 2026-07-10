@@ -1,0 +1,305 @@
+---
+author: Sat Naing
+pubDatetime: 2022-09-23T15:22:00Z
+modDatetime: 2022-09-23T15:22:00Z
+title: Reflection in Golang
+slug: reflection-in-golang
+featured: false
+draft: false
+tags:
+  - golang
+  - programming
+  - reflection
+description: "Learn how reflection works in Go using the reflect package, including Type, Kind, Value, and practical examples."
+canonicalURL: https://www.geeksforgeeks.org/go-language/reflection-in-golang/
+---
+
+# Reflection in Golang
+
+Reflection is the ability of a program to introspect and analyze its structure during runtime. In Go, reflection is primarily carried out using the `reflect` package, which provides APIs for inspecting and manipulating values dynamically.
+
+Reflection is often described as a form of **metaprogramming**.
+
+Before understanding reflection, it is helpful to understand **empty interfaces**.
+
+![Reflection in Golang](/posts/reflection-in-golang/index.png)
+
+## Empty Interfaces
+
+An interface that specifies **zero methods** is known as an **empty interface**.
+
+Empty interfaces are extremely useful when writing functions that can accept values of unknown types. Functions such as `fmt.Println()` and `fmt.Printf()` accept empty interfaces as arguments.
+
+Internally, an empty interface stores both:
+
+- The type of the value
+- The value itself
+
+This allows Go to preserve type information even when the variable is stored inside an interface.
+
+![Representation of an Empty Interface](./image1)
+
+## Example 1
+
+```go
+// Understanding Empty Interfaces in Golang
+
+package main
+
+import (
+	"fmt"
+)
+
+func observe(i interface{}) {
+
+	// Print the type
+	fmt.Printf("The type passed is: %T\n", i)
+
+	// Print the value
+	fmt.Printf("The value passed is: %#v\n", i)
+	fmt.Println("-------------------------------------")
+}
+
+func main() {
+
+	var value float64 = 15
+	value2 := "GeeksForGeeks"
+
+	observe(value)
+	observe(value2)
+}
+```
+
+### Output
+
+```text
+The type passed is: float64
+The value passed is: 15
+-------------------------------------
+The type passed is: string
+The value passed is: "GeeksForGeeks"
+-------------------------------------
+```
+
+### Explanation
+
+This example demonstrates that an empty interface can store values of any type while preserving both the underlying type and value.
+
+This includes primitive values, structs, pointers, slices, maps, and other Go types.
+
+## Why is Reflection Needed?
+
+The values passed to empty interfaces are often more than simple primitive values—they may be structs or other complex types.
+
+Suppose we receive a struct whose type is unknown at compile time. We may want to:
+
+- Inspect its fields
+- Determine the number of fields
+- Read field values
+- Generate a database schema
+- Build SQL queries
+- Serialize or deserialize data
+
+Reflection allows us to perform these operations during runtime.
+
+## The `reflect` Package
+
+Reflection in Go revolves around three fundamental concepts:
+
+- `reflect.Type`
+- `reflect.Value`
+- `reflect.Kind`
+
+These can be obtained using:
+
+- `reflect.TypeOf(x)`
+- `reflect.ValueOf(x)`
+- `Type.Kind()`
+
+### Type vs Kind
+
+| Type | Kind |
+|------|------|
+| Represents the declared type in Go. User-defined types preserve their names. | Represents the underlying category of a type. |
+| Obtained using `reflect.TypeOf()` | Obtained using `Kind()` |
+
+For example, given:
+
+```go
+type Employee struct{}
+```
+
+- Type → `main.Employee`
+- Kind → `struct`
+
+Similarly,
+
+```go
+type ID string
+```
+
+- Type → `main.ID`
+- Kind → `string`
+
+## Useful Reflection Methods
+
+The `reflect` package provides several useful methods.
+
+### `NumField()`
+
+Returns the number of fields in a struct.
+
+> **Note:** Calling this on a non-struct value causes a panic.
+
+### `Field()`
+
+Returns a struct field by index.
+
+This method is commonly used to iterate over all fields of a struct.
+
+## Example 2
+
+```go
+// Example program to demonstrate
+// Type, Kind and reflection methods.
+
+package main
+
+import (
+	"fmt"
+	"reflect"
+)
+
+type details struct {
+	fname   string
+	lname   string
+	age     int
+	balance float64
+}
+
+type myType string
+
+func showDetails(i, j interface{}) {
+
+	t1 := reflect.TypeOf(i)
+	k1 := t1.Kind()
+
+	t2 := reflect.TypeOf(j)
+	k2 := t2.Kind()
+
+	fmt.Println("Type of first interface:", t1)
+	fmt.Println("Kind of first interface:", k1)
+
+	fmt.Println("Type of second interface:", t2)
+	fmt.Println("Kind of second interface:", k2)
+
+	fmt.Println("The values in the first argument are:")
+
+	if reflect.ValueOf(i).Kind() == reflect.Struct {
+
+		value := reflect.ValueOf(i)
+		numberOfFields := value.NumField()
+
+		for i := 0; i < numberOfFields; i++ {
+
+			fmt.Printf("%d.Type:%T || Value:%#v\n",
+				i+1,
+				value.Field(i),
+				value.Field(i))
+
+			fmt.Println("Kind is", value.Field(i).Kind())
+		}
+	}
+
+	value := reflect.ValueOf(j)
+
+	fmt.Printf(
+		"The Value passed in second parameter is %#v",
+		value,
+	)
+}
+
+func main() {
+
+	iD := myType("12345678")
+
+	person := details{
+		fname:   "Go",
+		lname:   "Geek",
+		age:     32,
+		balance: 33000.203,
+	}
+
+	showDetails(person, iD)
+}
+```
+
+### Output
+
+```text
+Type of first interface: main.details
+Kind of first interface: struct
+Type of second interface: main.myType
+Kind of second interface: string
+
+The values in the first argument are :
+
+1.Type:reflect.Value || Value:"Go"
+Kind is string
+
+2.Type:reflect.Value || Value:"Geek"
+Kind is string
+
+3.Type:reflect.Value || Value:32
+Kind is int
+
+4.Type:reflect.Value || Value:33000.203
+Kind is float64
+
+The Value passed in second parameter is "12345678"
+```
+
+## Explanation
+
+In this example, two values are passed to `showDetails()`:
+
+- `person`, which is a struct
+- `iD`, which is a custom string type
+
+Using `reflect.TypeOf()` and `Kind()`, we observe:
+
+- `person`
+  - **Type:** `main.details`
+  - **Kind:** `struct`
+
+- `iD`
+  - **Type:** `main.myType`
+  - **Kind:** `string`
+
+This illustrates the difference between a value's declared type and its underlying kind.
+
+The example also uses:
+
+- `reflect.ValueOf()`
+- `NumField()`
+- `Field()`
+
+to inspect each field of the struct during runtime.
+
+> **Note:** `NumField()` and `Field()` are only valid for structs. Calling them on other kinds will result in a panic.
+
+Also note that `value.Field(i)` has the type `reflect.Value`. To determine the underlying category of the field, you must call its `Kind()` method.
+
+## Summary
+
+Reflection enables Go programs to inspect types and values at runtime, making it possible to write highly generic code.
+
+The `reflect` package provides powerful abstractions such as:
+
+- `Type`
+- `Kind`
+- `Value`
+
+along with methods for inspecting structs, fields, and other runtime information.
+
+Although reflection is powerful, it should be used judiciously because it adds complexity and runtime overhead. Nevertheless, it remains an indispensable tool for building libraries, serializers, ORMs, schema generators, and other generic frameworks.

@@ -22,9 +22,17 @@ const currentYear = new Date().getFullYear();
   >
     <Socials />
     <div class="my-2 flex flex-col items-center whitespace-nowrap sm:flex-row">
-      <span>{t.footer.copyright} &#169; {currentYear}</span>
-      <span class="hidden sm:inline">&nbsp;|&nbsp;</span>
-      <span>{t.footer.allRightsReserved}</span>
+      <span>
+        Made with
+        <a
+          href="https://astro-paper.pages.dev/"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="underline hover:no-underline"
+        >
+          AstroPaper
+        </a>
+      </span>
     </div>
   </div>
 </footer>
