@@ -1,0 +1,89 @@
+---
+author: Tirtharaj Sengupta
+pubDatetime: 2026-07-13T05:11:27.403Z
+modDatetime: 2026-07-13T05:11:27.403Z
+title: Building reliable Text to SQL systems II
+slug: building-reliable-text-to-sql-systems-ii
+featured: false
+draft: false
+tags:
+  - llm
+  - ai
+  - text-to-sql
+description: Building reliable text-to-SQL systems with semantic layers and constrained query representations that separate user intent from SQL generation.
+---
+
+import ResponsiveTable from '@/components/ResponsiveTable.astro';
+import DataGovernanceTable from '@/components/DataGovernanceTable.astro'
+import SemanticLayer from '@/components/SemanticLayer.astro'
+
+In the [previous article](/posts/building-reliable-text-to-sql-systems-i/), we discussed all the pitfalls in the naïve approach. Let's talk about system design now,
+how to avoid those pitfalls, and if unavoidable, how to trade them off.
+
+![Reliable Natural Language Database Querying with LLMs II](/posts/building-reliable-text-to-sql-systems-ii/index.png)
+
+## Table of contents
+{/* 1. Modern Data Governance
+2. The Semantic Layer Harness
+3. Incrementally discover relevant metrics via MCP.
+4. Per query system prompts with Golden Few Shot examples.
+5. Agentic Generation of an Intermediate Query Representation (IQR) based on the Semantic Layer
+6. Procedural Generation of SQL from IQR, with validation and access control.
+7. Enriching our system with feedback
+8. Monitoring and Observability
+9. My two cents */}
+
+## Modern Data Governance
+Before we tackle this system, it's important to understand that the problems we are likely to face are not because of the LLMs. LLMs are increasingly improving in the SQL generation paradigm, as evidenced by the
+Spider 2.0 benchmarks. [^1] The problems that plagued data-engineers before AI, now haunt AI systems. To tackle these, the data governance stack needs to keep up. 
+
+<DataGovernanceTable />
+
+## The Semantic Layer
+
+A semantic layer is an abstraction between your raw physical schema and the people (or agents) querying it. It maps business concepts — metrics, dimensions, entities — to the underlying tables, columns, and joins needed to compute them correctly, once, in a governed place.
+
+<SemanticLayer />
+
+### When you should NOT use a Harness
+
+1. You're building a proof of concept for text-to-SQL.
+2. The data model is simple enough that an LLM can reliably generate accurate SQL with system prompts and few-shot examples.
+3. The join graph can be reliably inferred from the schema, prompts, and examples.
+4. The cost of an occasional wrong answer is low (internal/exploratory use, not customer-facing or compliance-sensitive).
+5. Flexibility and iteration speed matter more than guaranteed correctness at this stage.
+
+### When you SHOULD use a Harness
+
+1. You have a complex, evolving enterprise data model where relationships and business logic aren't self-evident from the schema.
+2. Accuracy and correctness matter more than flexibility.
+3. You need enforced data governance and access control (GDPR, HIPAA, or similar compliance requirements).
+4. Many people across the org query the same data and need consistent metric definitions.
+5. You already have (or are building) a semantic layer that a harness can plug into rather than duplicate.
+
+### Metrics
+
+### Relationships
+
+### Grain
+
+### Analytical Operations
+
+## The Query Representation
+
+## The Query Compiler
+
+## Access Control
+
+## Validation
+
+## What Does This Buy Us?
+
+## But There Is a Cost
+
+## YAML, DSL, or Something Else?
+
+## Conclusion
+
+
+[^1]: [Spider 2.0](https://spider2-sql.github.io/)

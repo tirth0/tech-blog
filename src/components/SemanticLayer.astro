@@ -1,0 +1,333 @@
+---
+/**
+ * SemanticLayerArchitecture.astro
+ *
+ * Architecture:
+ *
+ * [Question] ──► ( LLM ) ◄── calls/returns ──► [Semantic layer]
+ *                    │        (governed metrics, dims, joins, access)
+ *                    │ hands off IQR
+ *                    ▼
+ *             [Query translator]
+ *             (parse → generate SQL → validate)
+ *                    │
+ *                    ▼  (exits the harness)
+ *                 [SQL DB]
+ *
+ * LLM + Semantic layer + Query translator = Harness
+ * The SQL database is an external system the harness talks to —
+ * it is deliberately drawn outside the harness boundary.
+ */
+---
+
+<figure class="sla-figure">
+  <svg
+    viewBox="0 0 950 880"
+    role="img"
+    aria-labelledby="sla-title sla-desc"
+    class="sla-svg"
+  >
+    <title id="sla-title">Semantic layer harness architecture</title>
+
+    <desc id="sla-desc">
+      A user question is sent to an LLM. The LLM calls a semantic layer,
+      which exposes governed metrics, dimensions, relationships, and
+      access control, and returns that context to the LLM on a separate
+      path. The LLM then hands an intermediate query representation to a
+      deterministic query translator, which parses it, generates SQL, and
+      validates it. The LLM, semantic layer, and query translator make up
+      the harness. The SQL database sits outside the harness boundary as
+      an external system the translator sends validated SQL to.
+    </desc>
+
+    <defs>
+      <marker
+        id="sla-arrow"
+        viewBox="0 0 10 10"
+        refX="8"
+        refY="5"
+        markerWidth="6"
+        markerHeight="6"
+        orient="auto"
+      >
+        <path
+          d="M2 1L8 5L2 9"
+          fill="none"
+          stroke="var(--sla-arrow)"
+          stroke-width="1.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+      </marker>
+    </defs>
+
+    <!-- Harness boundary (LLM + semantic layer + query translator only) -->
+    <rect
+      x="200"
+      y="40"
+      width="710"
+      height="680"
+      rx="20"
+      class="sla-harness"
+    />
+    <text x="228" y="78" class="sla-harness-label">The Harness</text>
+
+    <!-- User question -->
+    <g>
+      <rect x="10" y="326" width="170" height="88" rx="8" class="sla-box sla-box--neutral" />
+      <text x="95" y="370" text-anchor="middle" dominant-baseline="central" class="sla-label">
+        User question
+      </text>
+    </g>
+
+    <!-- Question → LLM -->
+    <line x1="180" y1="370" x2="250" y2="370" class="sla-arr" marker-end="url(#sla-arrow)" />
+
+    <!-- LLM -->
+    <g>
+      <rect x="250" y="326" width="200" height="88" rx="10" class="sla-box sla-box--llm" />
+      <text x="350" y="358" text-anchor="middle" dominant-baseline="central" class="sla-label">LLM</text>
+      <text x="350" y="384" text-anchor="middle" dominant-baseline="central" class="sla-sublabel">
+        Interprets intent
+      </text>
+    </g>
+
+    <!-- ===================== Semantic layer ===================== -->
+    <g>
+      <rect x="520" y="86" width="370" height="240" rx="10" class="sla-box sla-box--semantic" />
+      <text x="705" y="120" text-anchor="middle" dominant-baseline="central" class="sla-label">
+        Semantic layer
+      </text>
+      <text x="705" y="144" text-anchor="middle" dominant-baseline="central" class="sla-subtitle">
+        Governed metric &amp; entity definitions
+      </text>
+
+      <rect x="544" y="168" width="150" height="50" rx="6" class="sla-box sla-box--nested-semantic" />
+      <text x="619" y="193" text-anchor="middle" dominant-baseline="central" class="sla-nested-label">Metrics</text>
+
+      <rect x="716" y="168" width="150" height="50" rx="6" class="sla-box sla-box--nested-semantic" />
+      <text x="791" y="193" text-anchor="middle" dominant-baseline="central" class="sla-nested-label">Dimensions</text>
+
+      <rect x="544" y="230" width="150" height="50" rx="6" class="sla-box sla-box--nested-semantic" />
+      <text x="619" y="255" text-anchor="middle" dominant-baseline="central" class="sla-nested-label">Relationships</text>
+
+      <rect x="716" y="230" width="150" height="50" rx="6" class="sla-box sla-box--nested-semantic" />
+      <text x="791" y="255" text-anchor="middle" dominant-baseline="central" class="sla-nested-label">Access control</text>
+
+      <text x="705" y="304" text-anchor="middle" dominant-baseline="central" class="sla-subtitle">
+        Single source of truth — no raw SQL from the LLM
+      </text>
+    </g>
+
+    <!-- Calls path: LLM top edge up to semantic layer's left edge -->
+    <path d="M310,326 L310,126 L520,126" class="sla-arr" marker-end="url(#sla-arrow)" />
+    <text x="415" y="108" text-anchor="middle" class="sla-flow-label">calls</text>
+
+    <!--
+      Returns path: semantic layer's left edge down to LLM's right edge.
+      Label sits directly in the pocket where the arrow terminates, right
+      next to its horizontal run and arrowhead — not on any stroke.
+    -->
+    <path d="M520,266 L480,266 L480,390 L450,390" class="sla-arr" marker-end="url(#sla-arrow)" />
+    <text x="480" y="406" text-anchor="middle" class="sla-flow-label">returns</text>
+
+    <!-- ===================== Query translator ===================== -->
+    <g>
+      <rect x="520" y="400" width="370" height="296" rx="10" class="sla-box sla-box--translator" />
+      <text x="705" y="434" text-anchor="middle" dominant-baseline="central" class="sla-label">
+        Query translator
+      </text>
+      <text x="705" y="458" text-anchor="middle" dominant-baseline="central" class="sla-subtitle">
+        Deterministic — no LLM in this step
+      </text>
+
+      <rect x="544" y="482" width="322" height="46" rx="6" class="sla-box sla-box--nested-translator" />
+      <text x="705" y="505" text-anchor="middle" dominant-baseline="central" class="sla-nested-label">
+        1. Parse IQR
+      </text>
+
+      <rect x="544" y="540" width="322" height="46" rx="6" class="sla-box sla-box--nested-translator" />
+      <text x="705" y="563" text-anchor="middle" dominant-baseline="central" class="sla-nested-label">
+        2. Generate SQL
+      </text>
+
+      <rect x="544" y="598" width="322" height="46" rx="6" class="sla-box sla-box--nested-translator" />
+      <text x="705" y="621" text-anchor="middle" dominant-baseline="central" class="sla-nested-label">
+        3. Validate &amp; authorize
+      </text>
+
+      <text x="705" y="674" text-anchor="middle" dominant-baseline="central" class="sla-subtitle">
+        Only validated SQL ever leaves the harness
+      </text>
+    </g>
+
+    <!-- Hands-off-IQR path: LLM bottom edge down to translator's left edge -->
+    <path d="M350,414 L350,500 L520,500" class="sla-arr" marker-end="url(#sla-arrow)" />
+    <text x="440" y="486" text-anchor="middle" class="sla-flow-label">hands off IQR</text>
+
+    <!-- SQL database — outside the harness -->
+    <g>
+      <rect x="600" y="770" width="210" height="76" rx="8" class="sla-box sla-box--db" />
+      <text x="705" y="798" text-anchor="middle" dominant-baseline="central" class="sla-label">SQL database</text>
+      <text x="705" y="820" text-anchor="middle" dominant-baseline="central" class="sla-sublabel">
+        External system
+      </text>
+    </g>
+
+    <!-- Translator → DB, crosses out of the harness boundary -->
+    <path d="M705,696 L705,770" class="sla-arr" marker-end="url(#sla-arrow)" />
+  </svg>
+</figure>
+
+<style>
+  .sla-figure {
+    margin: 2rem 0;
+  }
+
+  .sla-svg {
+    width: 100%;
+    height: auto;
+    display: block;
+
+    --sla-text: #1f1f1d;
+    --sla-text-muted: #6b6a63;
+    --sla-arrow: #73726c;
+
+    --sla-neutral-fill: #f1efe8;
+    --sla-neutral-stroke: #b4b2a9;
+
+    --sla-llm-fill: #eeedfe;
+    --sla-llm-stroke: #7f77dd;
+
+    --sla-semantic-fill: #e1f5ee;
+    --sla-semantic-stroke: #1d9e75;
+    --sla-semantic-nested-fill: #f2faf6;
+    --sla-semantic-nested-stroke: #8fd4bb;
+
+    --sla-translator-fill: #faece7;
+    --sla-translator-stroke: #d85a30;
+    --sla-translator-nested-fill: #fdf3ef;
+    --sla-translator-nested-stroke: #eba084;
+
+    --sla-db-fill: #e6f1fb;
+    --sla-db-stroke: #378add;
+
+    --sla-harness-stroke: #a19eef;
+    --sla-harness-fill: #eeedfe;
+    --sla-harness-label: #534ab7;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .sla-svg {
+      --sla-text: #ece9e0;
+      --sla-text-muted: #b4b2a9;
+      --sla-arrow: #9c9a92;
+
+      --sla-neutral-fill: #2c2c2a;
+      --sla-neutral-stroke: #5f5e5a;
+
+      --sla-llm-fill: #26215c;
+      --sla-llm-stroke: #7f77dd;
+
+      --sla-semantic-fill: #04342c;
+      --sla-semantic-stroke: #1d9e75;
+      --sla-semantic-nested-fill: #0a4a3d;
+      --sla-semantic-nested-stroke: #2ebd8d;
+
+      --sla-translator-fill: #4a1b0c;
+      --sla-translator-stroke: #d85a30;
+      --sla-translator-nested-fill: #5c2410;
+      --sla-translator-nested-stroke: #f0855a;
+
+      --sla-db-fill: #042c53;
+      --sla-db-stroke: #378add;
+
+      --sla-harness-stroke: #7f77dd;
+      --sla-harness-fill: #26215c;
+      --sla-harness-label: #cecbf6;
+    }
+  }
+
+  .sla-box {
+    stroke-width: 1.25;
+  }
+
+  .sla-box--neutral { fill: var(--sla-neutral-fill); stroke: var(--sla-neutral-stroke); }
+  .sla-box--llm { fill: var(--sla-llm-fill); stroke: var(--sla-llm-stroke); }
+  .sla-box--semantic { fill: var(--sla-semantic-fill); stroke: var(--sla-semantic-stroke); }
+  .sla-box--nested-semantic {
+    fill: var(--sla-semantic-nested-fill);
+    stroke: var(--sla-semantic-nested-stroke);
+    stroke-width: 1;
+  }
+  .sla-box--translator { fill: var(--sla-translator-fill); stroke: var(--sla-translator-stroke); }
+  .sla-box--nested-translator {
+    fill: var(--sla-translator-nested-fill);
+    stroke: var(--sla-translator-nested-stroke);
+    stroke-width: 1;
+  }
+  .sla-box--db { fill: var(--sla-db-fill); stroke: var(--sla-db-stroke); }
+
+  .sla-label {
+    font-size: 18px;
+    font-weight: 500;
+    fill: var(--sla-text);
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+
+  .sla-sublabel {
+    font-size: 14px;
+    fill: var(--sla-text-muted);
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+
+  .sla-subtitle {
+    font-size: 13px;
+    font-style: italic;
+    fill: var(--sla-text-muted);
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+
+  .sla-nested-label {
+    font-size: 14px;
+    fill: var(--sla-text);
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+
+  .sla-harness {
+    fill: var(--sla-harness-fill);
+    fill-opacity: 0.35;
+    stroke: var(--sla-harness-stroke);
+    stroke-width: 1.25;
+    stroke-dasharray: 5 4;
+  }
+
+  .sla-harness-label {
+    font-size: 17px;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    fill: var(--sla-harness-label);
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+
+  .sla-arr {
+    stroke: var(--sla-arrow);
+    stroke-width: 1.5;
+    fill: none;
+    stroke-linejoin: round;
+  }
+
+  .sla-flow-label {
+    font-size: 13px;
+    fill: var(--sla-text-muted);
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+
+  .sla-caption {
+    margin-top: 0.85rem;
+    font-size: 0.9rem;
+    line-height: 1.55;
+    color: var(--sla-text-muted, #6b6a63);
+    max-width: 68ch;
+  }
+</style>
