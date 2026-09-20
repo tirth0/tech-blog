@@ -1,0 +1,44 @@
+---
+author: Tirtharaj Sengupta
+pubDatetime: 2026-07-13T05:11:27.403Z
+modDatetime: 2026-07-13T05:11:27.403Z
+title: AI powered Noise Cancellation in the Browser
+slug: ai-powered-noise-cancellation-in-the-browser
+featured: false
+draft: false
+tags:
+  - ai
+  - machine-learning
+  - noise-cancellation
+  - wasm
+  - simd
+  - audio-worklet
+  - web-audio-api
+  - rnnoise
+  - gtcrn
+  - deepfilternet3
+description: Building reliable noise-cancellation systems in the browser with AI-powered models and WebAssembly.
+---
+
+Denoising pipelines are indispensable whether you're building a voice-chat application, a podcasting platform or a video conferencing tool using WebRTC.  
+
+Fortunately, it's fairly possible to build a noise-cancellation system in the browser using ML models and the Web Audio API.
+
+![AI powered noise cancellation](/posts/ai-powered-noise-cancellation-in-the-browser/index.png)
+
+## Table of Contents
+
+## Ins and Outs of the Web Audio API
+
+According to the [MDN](https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API), the Web Audio API provides a powerful and versatile system for controlling audio on the Web, allowing developers to choose audio sources, add effects to audio, create audio visualizations, apply spatial effects (such as panning) and much more.
+
+For this article, we will focus on the following components of the Web Audio API:
+
+1. **_AudioContext_**: The central object that manages the audio processing graph and provides the environment in which audio is created, processed, and routed.
+2. **_AudioWorklet_**: Provides a way to implement custom real-time audio processing, including JavaScript or WebAssembly-based DSP, outside the main thread.
+3. **_GainNode_**: Controls the amplitude of an audio signal and can be used to adjust volume or apply gain changes over time.
+4. **_BiquadFilterNode_**: Applies common audio filters such as low-pass, high-pass, band-pass, and shelving filters to shape the frequency content of an audio signal.
+5. **_DynamicsCompressorNode_**: Reduces the dynamic range of an audio signal by attenuating louder portions, helping produce a more consistent output level.
+
+
+Most of our work is going to involve the AudioContext and the AudioWorklet.
